@@ -26,11 +26,11 @@ import { AnalyticsModule } from './analytics/analytics.module';
     //TODO env
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'postgres',
-      port: 5432,
-      username: 'root',
-      password: 'root',
-      database: 'shakita',
+      host: process.env.DB_HOST,
+      port: process.env.DB_HOST ? Number(process.env.DB_HOST) : 5432,
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
       entities: ['dist/**/*.entity{.ts,.js}'],
       autoLoadEntities: true,
       synchronize: true,
