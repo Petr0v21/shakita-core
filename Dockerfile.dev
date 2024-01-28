@@ -1,0 +1,20 @@
+# Base image
+FROM node:14-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Copy package.json and package-lock.json
+COPY package*.json ./
+
+RUN     npm i -g pnpm@6.32.20
+RUN     pnpm i
+
+# Copy the rest of the application code
+COPY . .
+
+# Expose the port your NestJS app is listening on
+EXPOSE 3000
+
+# Command to start your NestJS app
+CMD ["pnpm", "run", "start:dev"]

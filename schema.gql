@@ -1,0 +1,257 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Application {
+  id: String!
+  email: String!
+  place: String!
+  description: String
+  phone: String
+  name: String!
+  telegram: String
+  instagram: String
+  enable_notification: Boolean!
+  status: ApplicationStatus!
+  date: DateTime!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+enum ApplicationStatus {
+  REJECTED
+  PENDING
+  APPROVED
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Bonus {
+  id: String!
+  count: Float!
+  asset: String!
+  description: String!
+  isActive: Boolean!
+
+  """How much activations must be for new level"""
+  condition: Float
+  level: BonusLevelType
+  valueType: BonusValueType!
+  payload: JSON
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+enum BonusLevelType {
+  JUNIOR
+  MIDDLE
+  SENIOR
+}
+
+enum BonusValueType {
+  POINT
+  PERCENT
+}
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+type BonusTicket {
+  id: String!
+  code: String!
+  ticketType: BonusTicketType!
+  activeTill: DateTime
+  isActive: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+enum BonusTicketType {
+  CONST
+  DISPOSABLE
+}
+
+type Session {
+  id: String!
+  refreshToken: String!
+  ip: String!
+  userAgent: JSON
+  createdAt: DateTime!
+  endAt: DateTime
+  updatedAt: DateTime!
+}
+
+type User {
+  id: String!
+  email: String!
+  verified_email: Boolean
+  isGoogleAuth: Boolean
+  picture: String
+  name: String
+  google_id: String
+  password: String
+  phone: String
+  enable_notifications: Boolean!
+  isFullAuth: Boolean!
+  role: UserRole!
+  telegram: String
+  instagram: String
+  rate: Float
+  client_assessment: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+enum UserRole {
+  user
+  manager
+  analyt
+  super_manager
+  admin
+  blocked
+}
+
+type BonusTicketWholeType {
+  id: String!
+  code: String!
+  ticketType: BonusTicketType!
+  activeTill: DateTime
+  isActive: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  bonus: Bonus
+  user: User
+}
+
+type UserType {
+  id: String!
+  email: String!
+  verified_email: Boolean
+  isGoogleAuth: Boolean
+  picture: String
+  name: String
+  google_id: String
+  password: String
+  phone: String
+  telegram: String
+  instagram: String
+  enable_notifications: Boolean!
+  isFullAuth: Boolean!
+  role: UserRole!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  sessions: [Session!]
+  applications: [Application!]
+  bonusTickets: [BonusTicketWholeType!]
+}
+
+type SuccessOutput {
+  success: Boolean!
+}
+
+type Tokens {
+  accessToken: String!
+  refreshToken: String!
+}
+
+type ApplicationType {
+  id: String!
+  email: String!
+  place: String!
+  description: String
+  phone: String
+  name: String!
+  telegram: String
+  instagram: String
+  enable_notification: Boolean!
+  status: ApplicationStatus!
+  date: DateTime!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  user: User
+}
+
+type AnalyticsAverageType {
+  applications: String!
+  applications_percent: String!
+  users: String!
+  users_percent: String!
+}
+
+type AnalyticsWithAverageType {
+  applications: Float!
+  users: Float!
+  average: AnalyticsAverageType!
+}
+
+type AnalyticsApplicationsType {
+  applications_auth: Float!
+  applications_unauth: Float!
+}
+
+type AnalyticsCustomRangeType {
+  applications: Float!
+  users: Float!
+  startOfMonth: DateTime!
+  endOfMonth: DateTime!
+}
+
+type AnalyticsHistoryItemType {
+  year: Float!
+  month: Float!
+  count: Float!
+}
+
+type AnalyticsHistoryType {
+  applications: [AnalyticsHistoryItemType!]!
+  users: [AnalyticsHistoryItemType!]!
+}
+
+type Query {
+  findOneUser(id: String!): UserType
+  findUsers(skip: Float = 0, take: Float = 15, id: String, name: String, contact: String, role: UserRole): [User!]
+  getMe: UserType!
+  login(email: String!, password: String!): Tokens!
+  refresh(token: String!): Tokens!
+  findOneApplication(id: String!): ApplicationType
+  findApplicationsByDate(date: DateTime!): [Application!]
+  findApplications(skip: Float = 0, take: Float = 15, id: String, place: String, date_from: DateTime, date_to: DateTime, status: ApplicationStatus): [Application!]
+  findApplicationsHistory(email: String!): [Application!]
+  getApplicationsHistory: [Application!]
+  getTicket(code: String!): BonusTicketWholeType
+  findBonus(skip: Float = 0, take: Float = 15, id: String, valueType: BonusValueType, level: BonusLevelType, isActive: Boolean, asset: String): [Bonus!]
+  checkCode(code: String!, email: String!): SuccessOutput!
+  getActualData: AnalyticsWithAverageType!
+  getAllData: AnalyticsWithAverageType!
+  getCorrelationApplicationsData(startOf: DateTime, endOf: DateTime): AnalyticsApplicationsType!
+  getCustomData(startOfMonth: DateTime!, endOfMonth: DateTime!): AnalyticsCustomRangeType!
+  getHistoryData(fillEmptyMonth: Boolean, startOf: DateTime, endOf: DateTime): AnalyticsHistoryType!
+}
+
+type Mutation {
+  createOneUser(email: String, phone: String, telegram: String, instagram: String, enable_notifications: Boolean, picture: String, name: String, password: String, role: UserRole! = user, verified_email: Boolean): User!
+  deleteOneUser(id: String!): SuccessOutput!
+  updateOneUser(id: String!, email: String, phone: String, telegram: String, instagram: String, enable_notifications: Boolean, isFullAuth: Boolean, verified_email: Boolean, picture: String, name: String, role: UserRole, password: String): SuccessOutput!
+  updateMe(id: String!, email: String, phone: String, telegram: String, instagram: String, enable_notifications: Boolean, isFullAuth: Boolean, verified_email: Boolean, picture: String, name: String, role: UserRole, password: String): SuccessOutput!
+  register(name: String!, email: String!, password: String!, phone: String!): Tokens!
+  authGoogle(token: String!): Tokens!
+  logout(token: String!): SuccessOutput!
+  updateMyOneApplication(id: String!, place: String, date: DateTime, status: ApplicationStatus, name: String, phone: String, telegram: String, instagram: String, email: String, description: String, enable_notification: Boolean): SuccessOutput!
+  createOneApplication(place: String!, date: DateTime!, name: String!, phone: String, telegram: String, instagram: String, email: String!, description: String, enable_notification: Boolean! = true, status: ApplicationStatus): Application
+  deleteOneApplication(id: String!): SuccessOutput!
+  updateOneApplication(id: String!, place: String, date: DateTime, status: ApplicationStatus, name: String, phone: String, telegram: String, instagram: String, email: String, description: String, enable_notification: Boolean): SuccessOutput!
+  createBonus(count: Float!, asset: String!, description: String!, condition: Float, level: BonusLevelType, valueType: BonusValueType!, payload: JSON, isActive: Boolean): Bonus
+  deleteBonus(id: String!): SuccessOutput
+  createBonusTicket(code: String!, ticketType: BonusTicketType, activeTill: DateTime, bonusId: String!, userId: String!): BonusTicket
+  updateBonus(count: Float, asset: String, description: String, condition: Float, level: BonusLevelType, valueType: BonusValueType, payload: JSON, isActive: Boolean, id: String!): SuccessOutput
+  updateBonusTicket(code: String, ticketType: BonusTicketType, activeTill: DateTime, bonusId: String, userId: String, id: String!): SuccessOutput
+  deleteBonusTicket(id: String!): SuccessOutput
+  activateBonus(userId: String!, bonusTicketId: String!): SuccessOutput
+  getCode(email: String!): SuccessOutput!
+  resetPasswordCode(email: String!, code: String!, password: String!): SuccessOutput!
+}
