@@ -36,6 +36,7 @@ import { ConfigModule } from '@nestjs/config';
       entities: ['dist/**/*.entity{.ts,.js}'],
       autoLoadEntities: true,
       synchronize: true,
+      ssl: true,
     }),
     UserModule,
     SessionModule,
