@@ -15,9 +15,11 @@ import { AuthCodeModule } from './authcode/authcode.module';
 import { S3Module } from './s3/s3.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { AnalyticsModule } from './analytics/analytics.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: 'schema.gql',
