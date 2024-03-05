@@ -22,7 +22,6 @@ export class S3Service {
   }
 
   async uploadFile(file: Express.Multer.File, user_id?: string) {
-    console.log(file);
     const uploadParams = {
       Bucket: this.bucketName,
       Key: user_id.toString() + uuidv4() + '_' + file.originalname,

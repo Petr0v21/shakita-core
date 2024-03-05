@@ -12,7 +12,6 @@ export class UserService {
   ) {}
 
   async find(args: GetUsersArgs) {
-    console.log(args);
     let filter = [];
     if (args.id) {
       filter = [
@@ -47,7 +46,6 @@ export class UserService {
     if (!Object.entries(filter[0]).find((item) => item[1] !== null)) {
       filter = [];
     }
-    console.log(filter);
     return await this.userRepository.find({
       where: filter,
       order: {
@@ -80,7 +78,7 @@ export class UserService {
     });
   }
 
-  async create(args: any) {
+  async create(args: Partial<User>) {
     return await this.userRepository.save(args);
   }
 

@@ -37,7 +37,6 @@ export class S3Controller {
 
   @Delete('delete')
   deleteFile(@Body() body: DeleteFileArgs) {
-    console.log(body);
     return this.s3Service.deleteFile(body.key);
   }
 }

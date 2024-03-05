@@ -16,6 +16,7 @@ import { RegisterGoogleArgs } from './args/RegisterGoogleArgs';
 import { GoogleResponse } from '../types';
 import { SuccessOutput } from 'src/graphql/dto/SuccessOutput';
 import { UserRole } from 'src/user/graphql/userRole.enum';
+import { BonusService } from 'src/bonus/bonus.service';
 
 @Resolver()
 export class AuthResolver {
@@ -25,6 +26,7 @@ export class AuthResolver {
     private readonly authService: AuthService,
     private readonly userService: UserService,
     private readonly sessionService: SessionService,
+    private readonly bonusService: BonusService,
   ) {}
 
   @Query(() => Tokens)
@@ -97,7 +99,7 @@ export class AuthResolver {
     });
     if (result.user.email) {
       await this.authService.updateUserAplication(user);
-      await this.authService.addPersonalBonus(user.id);
+      await this.bonusService.addPersonalBonus(user.id);
     }
     return tokens;
   }
@@ -116,7 +118,6 @@ export class AuthResolver {
     if (!check || check.error) {
       throw new UnauthorizedException();
     }
-    console.log(check);
     const user = await this.authService.validateUserByUsername(check.email);
     if (!user) {
       const { id, ...body } = check as GoogleResponse;
@@ -140,7 +141,7 @@ export class AuthResolver {
 
       if (result.user.email) {
         await this.authService.updateUserAplication(newUser);
-        await this.authService.addPersonalBonus(newUser.id);
+        await this.bonusService.addPersonalBonus(newUser.id);
       }
 
       return tokens;

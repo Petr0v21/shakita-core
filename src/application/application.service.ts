@@ -8,6 +8,7 @@ import { UpdateOneApplicationArgs } from './graphql/args/UpdateOneApplicationArg
 import { ApplicationStatus } from './graphql/application.enum';
 import { GetApplicationsArgs } from './graphql/args/GetApplicationsArgs';
 import { MailerService } from '@nestjs-modules/mailer';
+import axios from 'axios';
 
 @Injectable()
 export class ApplicationService {
@@ -19,6 +20,33 @@ export class ApplicationService {
 
     private mailerService: MailerService,
   ) {}
+
+  async notificateApplication(args: { text: string; url }) {
+    try {
+      await axios.post(
+        `https://api.telegram.org/bot${
+          process.env.TELEGRAM_BOT_TOKEN ??
+          '6403426132:AAFaoOmmzSmiow9HyrLRNWuDoALpvuSCUqo'
+        }/sendMessage`,
+        {
+          chat_id: Number(process.env.TELEGRAM_CHANNEL_ID ?? '-1002108715919'),
+          text: args.text,
+          reply_markup: {
+            inline_keyboard: [
+              [
+                {
+                  url: args.url,
+                  text: 'Go to Application!',
+                },
+              ],
+            ],
+          },
+        },
+      );
+    } catch (err) {
+      console.error('ERROR SEND NOTIFICATION ON TELEGRAM', err);
+    }
+  }
 
   getRange(date: Date) {
     const date_to = new Date(date.toISOString());
@@ -55,7 +83,7 @@ export class ApplicationService {
           },
         ];
       }
-      console.log(args, filter);
+
       if (!Object.entries(filter[0]).find((item) => !!item[1])) {
         filter = [];
       }
@@ -113,7 +141,11 @@ export class ApplicationService {
       user = null;
     }
 
-    console.log('user apl', user);
+    const result = await this.applicationRepository.save({
+      ...args,
+      user: user,
+    });
+
     if (args.enable_notification) {
       await this.mailerService.sendMail({
         to: args.email,
@@ -121,16 +153,19 @@ export class ApplicationService {
         text: 'Application pending' + args.date + args.description,
       });
     }
-    console.log('Application name', args.name);
-    console.log({
-      ...args,
-      user: user,
+
+    await this.notificateApplication({
+      text: `
+      NEW APPLICATION!
+      ID: ${result.id}
+      Creater: ${args.name}
+      Contact: ${args.phone}
+      ${args.telegram ? 'Telegram: ' + args.telegram : ''}
+    `,
+      url: 'https://shakita-admin-panel.vercel.app/applications/' + result.id,
     });
 
-    return await this.applicationRepository.save({
-      ...args,
-      user: user,
-    });
+    return result;
   }
 
   async delete(id: string) {

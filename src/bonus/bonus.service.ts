@@ -20,6 +20,7 @@ import {
 import { GetBonusArgs } from './graphql/args/GetBonusArgs';
 import { BonusTicketWholeType } from './graphql/bonus.type';
 import { randomUUID } from 'crypto';
+import { BonusLevelType } from './graphql/bonusValueType.enum';
 
 @Injectable()
 export class BonusService {
@@ -44,21 +45,12 @@ export class BonusService {
       }),
     );
 
-    console.log(activetedBonus);
-
     const isAlreadyActivated =
       ticket.ticketType === BonusTicketType.DISPOSABLE ? !activetedBonus : true;
     const isActiveBonus = ticket.bonus.isActive;
     const isActiveBonusTicket =
       !ticket.activeTill || ticket.activeTill < new Date();
     const isUserCanActivate = ticket.user.id === userId;
-
-    console.log({
-      isAlreadyActivated,
-      isActiveBonus,
-      isActiveBonusTicket,
-      isUserCanActivate,
-    });
 
     return (
       isActiveBonus &&
@@ -77,42 +69,20 @@ export class BonusService {
         },
         relations: ['user', 'bonus'],
       });
-
       if (!ticket) {
         throw new BadRequestException(`Ticket not active`);
       }
-      console.log(ticket, args.userId);
 
       const isValid = await this.isActiveBonusTicket(ticket, args.userId);
-      console.log('isValid', isValid);
 
       if (!isValid) {
         throw new BadRequestException(`Can't activate`);
       }
-      console.log('Activete', {
-        ...args,
-        activatedByUserId: activator.id,
-      });
-      console.log(
-        await this.activatedBonusRepository.find({
-          where: {
-            ...args,
-            activatedByUserId: activator.id,
-          },
-        }),
-      );
-
       const result = await this.activatedBonusRepository.save({
         ...args,
         activatedByUserId: activator.id,
       });
-      console.log('result', result);
-      console.log(
-        ticket.ticketType,
-        ticket.ticketType === BonusTicketType.CONST,
-        ticket.bonus.condition,
-        ticket.bonus.level,
-      );
+
       try {
         if (result) {
           if (
@@ -163,26 +133,31 @@ export class BonusService {
   }
 
   async createBonusTicket(args: CreateOneBonusTicketArgs) {
-    const queryArgs = args;
+    try {
+      const queryArgs = args;
 
-    const bonus = await this.bonusRepository.findOne({
-      where: {
-        id: args.bonusId,
-      },
-    });
-
-    queryArgs['bonus'] = bonus;
-
-    if (args.userId) {
-      const user = await this.userRepository.findOne({
+      const bonus = await this.bonusRepository.findOne({
         where: {
-          id: args.userId,
+          id: args.bonusId,
         },
       });
-      queryArgs['user'] = user;
-    }
 
-    return await this.bonusTicketRepository.save(queryArgs);
+      queryArgs['bonus'] = bonus;
+
+      if (args.userId) {
+        const user = await this.userRepository.findOne({
+          where: {
+            id: args.userId,
+          },
+        });
+        queryArgs['user'] = user;
+      }
+
+      return await this.bonusTicketRepository.save(queryArgs);
+    } catch (err) {
+      console.error(err);
+      return null;
+    }
   }
 
   async deleteBonus(args: UniqueArgs) {
@@ -241,6 +216,10 @@ export class BonusService {
     });
   }
 
+  async findBonusById({ id }: UniqueArgs) {
+    return await this.bonusRepository.findOneBy({ id });
+  }
+
   async findBonusTicketById(id: string) {
     return await this.bonusTicketRepository.findOne({
       where: {
@@ -268,5 +247,27 @@ export class BonusService {
       },
       relations: ['bonus'],
     });
+  }
+
+  async addPersonalBonus(userId: string) {
+    try {
+      const bonus = await this.bonusRepository.findOne({
+        where: {
+          level: BonusLevelType.JUNIOR,
+          isActive: true,
+          asset: 'personal', //TODO GET FROM BIN
+        },
+      });
+      if (bonus) {
+        await this.createBonusTicket({
+          bonusId: bonus.id,
+          userId,
+          code: randomUUID(),
+          ticketType: BonusTicketType.CONST,
+        });
+      }
+    } catch (err) {
+      console.error(err);
+    }
   }
 }

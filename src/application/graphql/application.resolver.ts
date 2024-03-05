@@ -10,7 +10,7 @@ import {
   GetApplicationsByDateArgs,
   GetApplicationsHystoryArgs,
 } from './args/GetApplicationsArgs';
-import { BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException } from '@nestjs/common';
 import { ApplicationStatus } from './application.enum';
 import { UserRole } from 'src/user/graphql/userRole.enum';
 import { ApplicationType } from './application.type';
@@ -36,7 +36,6 @@ export class ApplicationResolver {
   async findApplications(
     @Args() args: GetApplicationsArgs,
   ): Promise<Application[]> {
-    console.log(args);
     return await this.applicationService.find(args);
   }
 
@@ -77,16 +76,15 @@ export class ApplicationResolver {
   ): Promise<SuccessOutput> {
     const application = await this.applicationService.findById(args.id);
     if (application.user && application.user.email === context.req.user.email) {
-      if (args.status !== application.status) {
-        throw new BadRequestException();
+      if (args.status === ApplicationStatus.APPROVED) {
+        throw new ForbiddenException();
       }
       const result = await this.applicationService.update({
         ...args,
-        status: ApplicationStatus.PENDING,
       });
       return { success: result.affected === 1 ? true : false };
     } else {
-      throw new UnauthorizedException();
+      throw new ForbiddenException();
     }
   }
 
@@ -95,7 +93,6 @@ export class ApplicationResolver {
     @Args() args: CreateOneApplicationArgs,
     @Context() context: any,
   ): Promise<Application | null> {
-    console.log('args', args);
     if (
       context.user === UserRole.user &&
       args.status &&

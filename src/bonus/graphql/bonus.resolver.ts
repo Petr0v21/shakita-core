@@ -33,6 +33,11 @@ export class BonusResolver {
     return await this.bonusService.findBonus(args);
   }
 
+  @Query(() => Bonus, { nullable: true })
+  async findOneBonus(@Args() args: UniqueArgs): Promise<Bonus> {
+    return await this.bonusService.findBonusById(args);
+  }
+
   @Mutation(() => Bonus, { nullable: true })
   async createBonus(@Args() args: CreateOneBonusArgs): Promise<Bonus> {
     return await this.bonusService.createBonus(args);

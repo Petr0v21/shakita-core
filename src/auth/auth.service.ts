@@ -8,9 +8,6 @@ import axios from 'axios';
 import { ApplicationService } from 'src/application/application.service';
 import { SessionService } from 'src/session/session.service';
 import { BonusService } from 'src/bonus/bonus.service';
-import { randomUUID } from 'crypto';
-import { BonusTicketType } from 'src/bonus/graphql/bonusTicket.enum';
-import { BonusLevelType } from 'src/bonus/graphql/bonusValueType.enum';
 
 @Injectable()
 export class AuthService {
@@ -83,29 +80,5 @@ export class AuthService {
     });
 
     return { accessToken, refreshToken };
-  }
-
-  async addPersonalBonus(userId: string) {
-    try {
-      const bonus = await this.bonusService.findBonus({
-        asset: 'personal',
-        isActive: true,
-        level: BonusLevelType.JUNIOR,
-      });
-      if (!bonus.length) {
-        console.error('Empty personal bonus');
-        return false;
-      }
-      const result = await this.bonusService.createBonusTicket({
-        userId,
-        code: randomUUID(),
-        ticketType: BonusTicketType.CONST,
-        bonusId: bonus[0].id,
-      });
-      return !!result;
-    } catch (err) {
-      console.error('Error Add personal bonus!', err);
-      return false;
-    }
   }
 }

@@ -20,6 +20,7 @@ export class AuthMiddleware implements NestMiddleware {
     'updateMyOneApplication',
     'getApplicationsHistory',
     'createBonusTicket',
+    'findOneBonus',
   ];
   private managerMethods: string[] = [
     'findOneApplication',
@@ -94,7 +95,6 @@ export class AuthMiddleware implements NestMiddleware {
 
       await this.jwtGuard.canActivate(context);
       const { role } = (req as any).user as User;
-      console.log('Role Auth Middleware', role);
 
       switch (role) {
         case UserRole.blocked: {
@@ -143,7 +143,6 @@ export class AuthMiddleware implements NestMiddleware {
     }
 
     if (req.baseUrl === '/file/upload' || req.baseUrl === '/file/delete') {
-      console.log('req.baseUrl', req.baseUrl);
       const context = new ExecutionContextHost([req, res, next]);
       await this.jwtGuard.canActivate(context);
       const request = context.switchToHttp().getRequest();

@@ -216,6 +216,9 @@ type Query {
   findOneUser(id: String!): UserType
   findUsers(skip: Float = 0, take: Float = 15, id: String, name: String, contact: String, role: UserRole): [User!]
   getMe: UserType!
+  getTicket(code: String!): BonusTicketWholeType
+  findBonus(skip: Float = 0, take: Float = 15, id: String, valueType: BonusValueType, level: BonusLevelType, isActive: Boolean, asset: String): [Bonus!]
+  findOneBonus(id: String!): Bonus
   login(email: String!, password: String!): Tokens!
   refresh(token: String!): Tokens!
   findOneApplication(id: String!): ApplicationType
@@ -223,8 +226,6 @@ type Query {
   findApplications(skip: Float = 0, take: Float = 15, id: String, place: String, date_from: DateTime, date_to: DateTime, status: ApplicationStatus): [Application!]
   findApplicationsHistory(email: String!): [Application!]
   getApplicationsHistory: [Application!]
-  getTicket(code: String!): BonusTicketWholeType
-  findBonus(skip: Float = 0, take: Float = 15, id: String, valueType: BonusValueType, level: BonusLevelType, isActive: Boolean, asset: String): [Bonus!]
   checkCode(code: String!, email: String!): SuccessOutput!
   getActualData: AnalyticsWithAverageType!
   getAllData: AnalyticsWithAverageType!
@@ -238,13 +239,6 @@ type Mutation {
   deleteOneUser(id: String!): SuccessOutput!
   updateOneUser(id: String!, email: String, phone: String, telegram: String, instagram: String, enable_notifications: Boolean, isFullAuth: Boolean, verified_email: Boolean, picture: String, name: String, role: UserRole, password: String): SuccessOutput!
   updateMe(id: String!, email: String, phone: String, telegram: String, instagram: String, enable_notifications: Boolean, isFullAuth: Boolean, verified_email: Boolean, picture: String, name: String, role: UserRole, password: String): SuccessOutput!
-  register(name: String!, email: String!, password: String!, phone: String!): Tokens!
-  authGoogle(token: String!): Tokens!
-  logout(token: String!): SuccessOutput!
-  updateMyOneApplication(id: String!, place: String, date: DateTime, status: ApplicationStatus, name: String, phone: String, telegram: String, instagram: String, email: String, description: String, enable_notification: Boolean): SuccessOutput!
-  createOneApplication(place: String!, date: DateTime!, name: String!, phone: String, telegram: String, instagram: String, email: String!, description: String, enable_notification: Boolean! = true, status: ApplicationStatus): Application
-  deleteOneApplication(id: String!): SuccessOutput!
-  updateOneApplication(id: String!, place: String, date: DateTime, status: ApplicationStatus, name: String, phone: String, telegram: String, instagram: String, email: String, description: String, enable_notification: Boolean): SuccessOutput!
   createBonus(count: Float!, asset: String!, description: String!, condition: Float, level: BonusLevelType, valueType: BonusValueType!, payload: JSON, isActive: Boolean): Bonus
   deleteBonus(id: String!): SuccessOutput
   createBonusTicket(code: String!, ticketType: BonusTicketType, activeTill: DateTime, bonusId: String!, userId: String!): BonusTicket
@@ -252,6 +246,13 @@ type Mutation {
   updateBonusTicket(code: String, ticketType: BonusTicketType, activeTill: DateTime, bonusId: String, userId: String, id: String!): SuccessOutput
   deleteBonusTicket(id: String!): SuccessOutput
   activateBonus(userId: String!, bonusTicketId: String!): SuccessOutput
+  register(name: String!, email: String!, password: String!, phone: String!): Tokens!
+  authGoogle(token: String!): Tokens!
+  logout(token: String!): SuccessOutput!
+  updateMyOneApplication(id: String!, place: String, date: DateTime, status: ApplicationStatus, name: String, phone: String, telegram: String, instagram: String, email: String, description: String, enable_notification: Boolean): SuccessOutput!
+  createOneApplication(place: String!, date: DateTime!, name: String!, phone: String, telegram: String, instagram: String, email: String!, description: String, enable_notification: Boolean! = true, status: ApplicationStatus): Application
+  deleteOneApplication(id: String!): SuccessOutput!
+  updateOneApplication(id: String!, place: String, date: DateTime, status: ApplicationStatus, name: String, phone: String, telegram: String, instagram: String, email: String, description: String, enable_notification: Boolean): SuccessOutput!
   getCode(email: String!): SuccessOutput!
   resetPasswordCode(email: String!, code: String!, password: String!): SuccessOutput!
 }

@@ -162,18 +162,6 @@ export class AnalyticsService {
           createdAt: Between(rangeDate.startOfMonth, rangeDate.endOfMonth),
         },
       });
-      console.log(
-        'previousAmounts',
-        previousAmounts,
-        new Date(
-          new Date(rangeDate.startOfMonth).setMonth(
-            rangeDate.startOfMonth.getMonth() - 1,
-          ),
-        ),
-        new Date(
-          new Date(rangeDate.endOfMonth).setMonth(new Date().getMonth() - 1),
-        ),
-      );
       return {
         ...currentAmounts,
         average: {
