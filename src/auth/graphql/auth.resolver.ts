@@ -130,7 +130,7 @@ export class AuthResolver {
       if (!newUser) {
         throw new UnauthorizedException();
       }
-      const tokens = await this.authService.generateTokens(user);
+      const tokens = await this.authService.generateTokens(newUser);
 
       const result = await this.sessionService.create({
         newUser,
