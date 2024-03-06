@@ -139,7 +139,7 @@ export class AuthResolver {
         userAgent: parsedUserAgent,
       });
 
-      if (result.user.email) {
+      if (result && newUser.id) {
         await this.authService.updateUserAplication(newUser);
         await this.bonusService.addPersonalBonus(newUser.id);
       }
